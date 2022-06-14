@@ -1,80 +1,77 @@
-/*void setup(){
-  size(1000,1000);
-}
 
-void draw(){
-  background(32);
-  ellipse(mouseX, mouseY, 50, 50);
-}*/
-
-/*PGraphics pg;
-
-void setup() {
-  size(640, 360);
-  pg = createGraphics(200, 100);
-}
-
-void draw() {
-  fill(0, 12);
-  rect(0, 0, width, height);
-  fill(255);
-  noStroke();
-  ellipse(mouseX, mouseY, 60, 60);
-  
-  pg.beginDraw();
-  pg.background(51);
-  pg.noFill();
-  pg.stroke(255);
-  pg.ellipse(mouseX-120, mouseY-60, 60, 60);
-  pg.endDraw();
-  
-  // Draw the offscreen buffer to the screen with image() 
-  image(pg, 120, 60); 
-}*/
-
-/*PImage img;
-
-void setup(){
-  size (570, 570);
-  img = loadImage("Image.jpg");
-}
-
-void draw(){
-  image(img,0,0);
-  image (img, 0, 0, width/2, height/2);
-}*/
 
 ArrayList<Integer> x = new ArrayList<Integer>(), y = new ArrayList<Integer>();
-int w=30, h=30, blocks=20, direction=2;
-int[]x_direction={0,0,1,-1},y_direction={1, -1, 0, 0,};
+int w=30, h=30, blocks=20, direction=2, foodx=15, foody=15, speed = 8, fc1 = 255, fc2 = 255, fc3 = 255; 
+int[]x_direction={0, 0, 1, -1}, y_direction={1, -1, 0, 0}; //direction for x and y
+boolean gameover=false;
 
-
-void setup(){
-  size(600, 600);
-  x.add(0);
+void setup() { 
+  size(600,600); 
+  x.add(0); //snake start position
   y.add(15);
-  
+}   
+void draw() {  
+  background(235, 131, 52); //Background colour is orange
+  fill(0, 255, 0); //snake color green
+  for (int i = 0; i < x.size(); i++) rect(x.get(i)*blocks, y.get(i)*blocks, blocks, blocks); //snake
+  if (!gameover) {  
+    fill(fc1, fc2, fc3); //food color red
+    ellipse(foodx*blocks+10, foody*blocks+10, blocks, blocks); //food
+    textAlign(LEFT); //score
+    textSize(25);
+    fill(255);
+    text("Score: " + x.size(), 10, 10, width - 20, 50);
+    if (frameCount%speed==0) { 
+      x.add(0, x.get(0) + x_direction[direction]); //make snake longer
+      y.add(0, y.get(0) + y_direction[direction]);
+      if (x.get(0) < 0 || y.get(0) < 0 || x.get(0) >= w || y.get(0) >= h) gameover = true; 
+      for (int i=1; i<x.size(); i++) 
+        if (x.get(0)==x.get(i)&&y.get(0)==y.get(i)) gameover=true; 
+      if (x.get(0)==foodx && y.get(0)==foody) { //new food if we touch
+         if (x.size() %5==0 && speed>=2) speed-=1;  // every 5 points speed increase
+        foodx = (int)random(0, w); //new food
+        foody = (int)random(0, h);
+        fc1 = (int)random(255); fc2 = (int)random(255); fc3 = (int)random(255); //new food color
+      } else { 
+        x.remove(x.size()-1); 
+        y.remove(y.size()-1);
+      }
+    }
+  } else {
+    fill(200, 200, 0); 
+    textSize(30); 
+    textAlign(CENTER); 
+    text("GAME OVER \n Your Score is: "+ x.size() +"\n Press ENTER", width/2, height/3);
+    if (keyCode == ENTER) { 
+      x.clear(); 
+      y.clear(); 
+      x.add(0);  
+      y.add(15);
+      direction = 2;
+      speed = 8;
+      gameover = false;
+    }
+  }
 }
+/*
+component.addMouseListener(new MouseAdapter(){
+ public void mousePressed(MouseEvent e){
+    mouseDown = true;
+  }
+ public void mouseReleased(MouseEvent e){
+    mouseDown = false;
+  }
+});
 
-void draw(){
-  background(0);
-  fill(56, 168, 111);
-  //fill(3, 40, 252);
-  //ellipse(200, 200, 80, 80);
-  //fill(random(255), random(255), random(255));
-  //ellipse(mouseX, mouseY, 80, 80);
-  for (int i = 0; i< x.size(); i++) rect(x.get(i)*blocks, y.get(i)*blocks, blocks, blocks);
-  if(frameCount%10==0){
-    x.add(0, x.get(0) + x_direction[direction]);
-    y.add(0, y.get(0) + y_direction[direction]);
-    
-    x.remove(x.size()-1);
-    y.remove(y.size()-1);
-} 
+component.addKeyListener(new KeyAdapter(){
+  public void KeyPressed(KeyEvent e){
+    if(MouseDown){
+      text("Game Paused");
+    }
+  }
+});
+*/
+void keyPressed() { 
+  int newdir=keyCode == DOWN? 0:(keyCode == UP?1:(keyCode == RIGHT?2:(keyCode == LEFT?3:-1)));
+  if (newdir != -1) direction = newdir;
 }
-
-void keyPressed(){
-  int newdir=keyCode==DOWN? 0:(keyCode==UP?1:(keyCode == RIGHT?2:(keyCode==LEFT?3:-1)));
-  if (newdir !=-1) direction=newdir;
-}
-//https://www.youtube.com/watch?v=UpGCxdTXfSY
